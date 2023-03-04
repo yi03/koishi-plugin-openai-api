@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-openai-api",
   "description": "openai-api 问答插件",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -16,7 +16,7 @@
   "scripts": {
     "build": "tsc -b"
   },
-  "homepage": "https://github.com/yi03/openai-api",
+  "homepage": "https://github.com/yi03/koishi-plugin-openai-api",
   "keywords": [
     "chatbot",
     "koishi",
