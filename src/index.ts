@@ -6,6 +6,9 @@ import { Config } from './config';
 export * from './config';
 export const name = 'openai-api';
 export const usage = `openai的api被墙了，国内用户必须要翻墙才能用。\n
+如果使用的是代理软件+机场的话，可以使用rule模式，如果依然不行的话，
+可以谷歌搜索如何添加自定义规则，把api.openai.com添加进自定义规则里，让api.openai.com的流量走代理。\n
+如果是手机不方便添加自定义规则的话，推荐使用clash + provider，不过会比较麻烦。\n
 每个账号的记忆是分开的，目前每个账号最长能记忆的Token数是max_tokens。\n
 每次对话都会附上历史对话，openai服务器端限制输入和输出加在一起的Token数不能超过4096，
 所以max_tokens不能调太大，否则输出会被截断。\n
