@@ -26,8 +26,8 @@ function getReplyCondition(session, config) {
   }
 }
 
-async function chat(chatbot: Chatbot, uid: string, prompt: string, setting: boolean, reset: boolean) {
-  uid = uid.replace(":", "_");
+async function chat(chatbot: Chatbot, session: any, prompt: string, setting: boolean, reset: boolean) {
+  let uid = session.uid.replace(":", "_");
   if (reset) {
     if (fs.existsSync(`${chatbot.memory_dir}/${uid}.json`)) {
       fs.unlinkSync(`${chatbot.memory_dir}/${uid}.json`);
@@ -42,7 +42,7 @@ async function chat(chatbot: Chatbot, uid: string, prompt: string, setting: bool
   }
   let memory = chatbot.load_memory(uid);
   memory.push({ "role": "user", "content": prompt });
-  let message = await chatbot.ask(memory);
+  let message = await chatbot.ask(memory, session);
   chatbot.save_memory(uid, memory, message);
   return message.content;
 }
@@ -66,22 +66,16 @@ export function apply(ctx: Context, config: Config) {
     .alias('set')
     .action(async ({ session }, input) => {
       if (!input?.trim()) return session.execute(`help ${name}`)
-      try {
-        await session.send(
-          h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, true, false)
-        )
-      }
-      catch { return session.text('.network-error') }
+      await session.send(
+        h('quote', { id: session.messageId }) + await chat(chatbot, session, input, true, false)
+      )
     })
   const cmd3 = ctx.command(`重置`)
     .alias('reset')
     .action(async ({ session }, input) => {
-      try {
-        await session.send(
-          h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, false, true)
-        )
-      }
-      catch { return session.text('.network-error') }
+      await session.send(
+        h('quote', { id: session.messageId }) + await chat(chatbot, session, input, false, true)
+      )
     })
   ctx.middleware(async (session, next) => {
     if (ctx.bots[session.uid])
@@ -93,11 +87,8 @@ export function apply(ctx: Context, config: Config) {
     if (input === '')
       return next(); // ignore empty message
     logger.info(`condition ${condition} met, replying`);
-    try {
-      await session.send(
-        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, false, false)
-      )
-    }
-    catch { return session.text('.network-error') }
+    await session.send(
+      h('quote', { id: session.messageId }) + await chat(chatbot, session, input, false, false)
+    )
   })
 }

@@ -42,21 +42,24 @@ export class Chatbot {
     }
   }
 
-  public async ask(messages: any[]) {
+  public async ask(messages: any[], session) {
     this.truncate_conversation(messages);
-    const response = await this.ctx.http.axios({
-      url: "https://api.openai.com/v1/chat/completions",
-      headers: { 'Authorization': `Bearer ${this.api_key}`, },
-      data: {
-        "model": this.model,
-        "messages": messages,
-        "temperature": this.temperature,
-        "presence_penalty": this.presence_penalty,
-        "frequency_penalty": this.frequency_penalty,
-      },
-      method: 'post',
-    });
-    return response.data.choices[0].message;
+    try {
+      const response = await this.ctx.http.axios({
+        url: "https://api.openai.com/v1/chat/completions",
+        headers: { 'Authorization': `Bearer ${this.api_key}`, },
+        data: {
+          "model": this.model,
+          "messages": messages,
+          "temperature": this.temperature,
+          "presence_penalty": this.presence_penalty,
+          "frequency_penalty": this.frequency_penalty,
+        },
+        method: 'post',
+      });
+      return response.data.choices[0].message;
+    }
+    catch { return session.text('.network-error') }
   }
 
   public load_memory(uid: string) {
