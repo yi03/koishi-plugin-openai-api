@@ -1,5 +1,8 @@
 调用openai官方的付费api。国内用户必须翻墙才能用。
 
+不要同时启用openai-api和openchat2插件，这两个插件有冲突。不出意外的话之后可以不用openchat2了。openchat2是我写的另一个插件。
+
+
 ## 用法
 
 艾特bot 或 提到bot的名字 或 回复bot 后，bot会回复你。
