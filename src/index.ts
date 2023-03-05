@@ -26,8 +26,8 @@ function getReplyCondition(session, config) {
   }
 }
 
-async function chat(chatbot: Chatbot, session: any, prompt: string, setting: boolean, reset: boolean) {
-  let uid = session.uid.replace(":", "_");
+async function chat(chatbot: Chatbot, uid: string, prompt: string, setting: boolean, reset: boolean) {
+  uid = uid.replace(":", "_");
   if (reset) {
     if (fs.existsSync(`${chatbot.memory_dir}/${uid}.json`)) {
       fs.unlinkSync(`${chatbot.memory_dir}/${uid}.json`);
@@ -42,7 +42,7 @@ async function chat(chatbot: Chatbot, session: any, prompt: string, setting: boo
   }
   let memory = chatbot.load_memory(uid);
   memory.push({ "role": "user", "content": prompt });
-  let message = await chatbot.ask(memory, session);
+  let message = await chatbot.ask(memory);
   chatbot.save_memory(uid, memory, message);
   return message.content;
 }
@@ -67,14 +67,14 @@ export function apply(ctx: Context, config: Config) {
     .action(async ({ session }, input) => {
       if (!input?.trim()) return session.execute(`help ${name}`)
       await session.send(
-        h('quote', { id: session.messageId }) + await chat(chatbot, session, input, true, false)
+        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, true, false)
       )
     })
   const cmd3 = ctx.command(`重置`)
     .alias('reset')
     .action(async ({ session }, input) => {
       await session.send(
-        h('quote', { id: session.messageId }) + await chat(chatbot, session, input, false, true)
+        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, false, true)
       )
     })
   ctx.middleware(async (session, next) => {
@@ -87,8 +87,15 @@ export function apply(ctx: Context, config: Config) {
     if (input === '')
       return next(); // ignore empty message
     logger.info(`condition ${condition} met, replying`);
-    await session.send(
-      h('quote', { id: session.messageId }) + await chat(chatbot, session, input, false, false)
-    )
+    try {
+      await session.send(
+        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, false, false)
+      )
+    }
+    catch {
+      session.send(
+        h('quote', { id: session.messageId }) + "网络异常，无法访问openai的api"
+      )
+    }
   })
 }
