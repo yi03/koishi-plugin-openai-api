@@ -1,8 +1,8 @@
 调用openai官方的付费api。国内用户必须翻墙才能用。
 
-不要同时启用openai-api和openchat2插件，这两个插件有冲突。openchat2是我写的另一个插件，没用的话不用管，不出意外的话之后不用openchat2了。
+代理配置见[下边](https://github.com/yi03/koishi-plugin-openai-api#%E4%BB%A3%E7%90%86%E9%85%8D%E7%BD%AE)
 
-如果使用的是代理软件+机场的话，可以使用rule模式，如果依然不行的话，可以谷歌搜索 如何添加自定义规则，把`api.openai.com`添加进自定义规则里，让`api.openai.com`的流量走代理。
+不要同时启用openai-api和openchat2插件，这两个插件有冲突。openchat2是我写的另一个插件，没用的话不用管，不出意外的话之后不用openchat2了。
 
 # 用法
 
@@ -33,7 +33,7 @@ openai自带的洗脑很强，所以设定人格需要一些技巧。
 
 这里以 clash 举例如何添加自定义规则：
 
-1. 右键点击你的机场的配置文件，然后点击 rules 。
+1. 右键点击你的机场的配置文件，然后点击 Rules 。
 
 ![](./img/image3.png)
 
@@ -49,9 +49,12 @@ openai自带的洗脑很强，所以设定人格需要一些技巧。
 
 ![](./img/image6.png)
 
+比如我的机场的配置是下边这样的。比如 Telegram 那一行的意思是 Telegram 的流量会走 🔰国外流量 ，然后看第一行， 🔰国外流量 会走新加坡的节点，所以最终 Telegram 的流量走了新加坡的节点。你们可以看看自己这里的配置，然后选择自己机场对应的标签。
+![](./img/image7.png)
+
 5. 注意到 openai.com 已经添加到规则里去了。然后点击 Save 即可。
 
-![](./img/image7.png)
+![](./img/image8.png)
 
 6. 然后试试是否能正常使用了，再不行的话我也没办法了。
 
