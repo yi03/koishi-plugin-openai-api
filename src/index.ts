@@ -6,9 +6,7 @@ import { Config } from './config';
 export * from './config';
 export const name = 'openai-api';
 export const usage = `openai的api被墙了，国内用户必须要翻墙才能用。\n
-如果使用的是代理软件+机场的话，可以使用rule模式，如果依然不行的话，
-可以谷歌搜索如何添加自定义规则，把api.openai.com添加进自定义规则里，让api.openai.com的流量走代理。\n
-如果是手机不方便添加自定义规则的话，推荐使用clash + provider，不过会比较麻烦。\n
+代理配置教程见 https://github.com/yi03/koishi-plugin-openai-api#代理配置\n
 每个账号的记忆是分开的，目前每个账号最长能记忆的Token数是max_tokens。\n
 每次对话都会附上历史对话，openai服务器端限制输入和输出加在一起的Token数不能超过4096，
 所以max_tokens不能调太大，否则输出会被截断。\n
@@ -18,31 +16,35 @@ const logger = new Logger(name);
 
 function getReplyCondition(session, config) {
   if (session.subtype === 'group') { // 群聊
-    if (session.parsed.appel)
-      return 1; // @bot
-    if (session.content.includes(config.bot_name))
+    if (session.parsed.appel && config.appel_flag)
+      return 1; // @bot或回复bot
+    if (session.content.includes(config.bot_name) && config.include_bot_name_flag)
       return 2; // 包含botname
-    return 0; // 不回复
   }
-  else {
+  else if (config.private_message_flag){
     return 3; // 私聊
   }
+  return 0;
 }
 
-async function chat(chatbot: Chatbot, uid: string, prompt: string, setting: boolean, reset: boolean) {
+function set_personality(chatbot: Chatbot, uid: string, prompt: string) {
   uid = uid.replace(":", "_");
-  if (reset) {
-    if (fs.existsSync(`${chatbot.memory_dir}/${uid}.json`)) {
-      fs.unlinkSync(`${chatbot.memory_dir}/${uid}.json`);
-      return "重置成功";
-    }
+  let memory = chatbot.load_memory(uid);
+  memory[0].content = prompt;
+  chatbot.save_memory(uid, memory);
+  return "设定成功";
+}
+
+function reset(chatbot: Chatbot, uid: string) {
+  uid = uid.replace(":", "_");
+  if (fs.existsSync(`${chatbot.memory_dir}/${uid}.json`)) {
+    fs.unlinkSync(`${chatbot.memory_dir}/${uid}.json`);
   }
-  if (setting) {
-    let memory = chatbot.load_memory(uid);
-    memory[0].content = prompt;
-    chatbot.save_memory(uid, memory);
-    return "设定成功";
-  }
+  return "重置成功";
+}
+
+async function chat(chatbot: Chatbot, uid: string, prompt: string) {
+  uid = uid.replace(":", "_");
   let memory = chatbot.load_memory(uid);
   memory.push({ "role": "user", "content": prompt });
   let message = await chatbot.ask(memory);
@@ -70,14 +72,14 @@ export function apply(ctx: Context, config: Config) {
     .action(async ({ session }, input) => {
       if (!input?.trim()) return session.execute(`help ${name}`)
       await session.send(
-        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, true, false)
+        h('quote', { id: session.messageId }) + set_personality(chatbot, session.uid, input)
       )
     })
   const cmd3 = ctx.command(`重置`)
     .alias('reset')
-    .action(async ({ session }, input) => {
+    .action(async ({ session }) => {
       await session.send(
-        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, false, true)
+        h('quote', { id: session.messageId }) + reset(chatbot, session.uid)
       )
     })
   ctx.middleware(async (session, next) => {
@@ -92,7 +94,7 @@ export function apply(ctx: Context, config: Config) {
     logger.info(`condition ${condition} met, replying`);
     try {
       await session.send(
-        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input, false, false)
+        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input)
       )
     }
     catch {
