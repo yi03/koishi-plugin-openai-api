@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-openai-api",
   "description": "openai-api 问答插件",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
