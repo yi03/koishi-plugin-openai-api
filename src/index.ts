@@ -82,15 +82,15 @@ export function apply(ctx: Context, config: Config) {
         h('quote', { id: session.messageId }) + reset(chatbot, session.uid)
       )
     })
-  ctx.middleware(async (session, next) => {
+  ctx.middleware(async (session) => {
     if (ctx.bots[session.uid])
       return; // ignore bots from self
     const condition = getReplyCondition(session, config);
     if (condition === 0)
-      return next(); // 不回复
+      return; // 不回复
     const input = session.content.replace(/<[^>]*>/g, ''); // 去除XML元素
     if (input === '')
-      return next(); // ignore empty message
+      return; // ignore empty message
     logger.info(`condition ${condition} met, replying`);
     try {
       await session.send(
