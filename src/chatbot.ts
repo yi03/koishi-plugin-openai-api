@@ -4,6 +4,7 @@ export class Chatbot {
   private ctx;
   private model: string;
   private api_key: string;
+  private bot_name: string;
   private max_tokens: number;
   private temperature: number;
   private presence_penalty: number;
@@ -13,22 +14,25 @@ export class Chatbot {
   constructor(
     ctx,
     api_key: string,
+    bot_name: string,
     model: string,
     max_tokens: number,
     temperature: number,
     presence_penalty: number,
     frequency_penalty: number,
     memory_dir: string,
+    system_prompt: string,
   ) {
     this.ctx = ctx;
     this.api_key = api_key;
+    this.bot_name = bot_name;
     this.model = model;
     this.max_tokens = max_tokens;
     this.temperature = temperature;
     this.presence_penalty = presence_penalty;
     this.frequency_penalty = frequency_penalty;
     this.memory_dir = memory_dir;
-    this.system_prompt = "You are ChatGPT, a large language model trained by OpenAI. Respond conversationally";
+    this.system_prompt = system_prompt;
   }
 
   private truncate_conversation(messages: any[]) {
@@ -70,7 +74,7 @@ export class Chatbot {
     } else {
       return [{
         "role": "system",
-        "content": this.system_prompt,
+        "content": `${this.system_prompt}你的名字是${this.bot_name}。`,
       }];
     }
   }

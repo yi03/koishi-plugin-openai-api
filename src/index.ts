@@ -7,6 +7,7 @@ export * from './config';
 export const name = 'openai-api';
 export const usage = `openai的api被墙了，国内用户必须要翻墙才能用。\n
 代理配置教程见 https://github.com/yi03/koishi-plugin-openai-api#代理配置\n
+默认的人格是猫娘，可以自己重新设定人格。
 每个账号的记忆是分开的，目前每个账号最长能记忆的Token数是max_tokens。\n
 每次对话都会附上历史对话，openai服务器端限制输入和输出加在一起的Token数不能超过4096，
 所以max_tokens不能调太大，否则输出会被截断。\n
@@ -21,7 +22,7 @@ function getReplyCondition(session, config) {
     if (session.content.includes(config.bot_name) && config.include_bot_name_flag)
       return 2; // 包含botname
   }
-  else if (config.private_message_flag){
+  else if (config.private_message_flag) {
     return 3; // 私聊
   }
   return 0;
@@ -54,16 +55,19 @@ async function chat(chatbot: Chatbot, uid: string, prompt: string) {
 
 export function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh'));
-
+  if (!config.default_personality_flag)
+    config.default_personality = "";
   const chatbot = new Chatbot(
     ctx,
     config.api_key,
+    config.bot_name,
     config.model,
     config.max_tokens,
     config.temperature,
     config.presence_penalty,
     config.frequency_penalty,
     config.memory_dir,
+    config.default_personality,
   );
 
   const cmd1 = ctx.command(`openai-api`)
