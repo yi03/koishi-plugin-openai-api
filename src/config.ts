@@ -27,8 +27,8 @@ export const Config: Schema<Config> = Schema.intersect([
     }).description("OpenAI 配置"),
     Schema.object({
         bot_name: Schema.string().description('机器人的名字'),
-        default_personality: Schema.string().description('机器人的默认人格').default('请你陪我角色扮演。 你要记住这些设定，并严格按照此设定角色扮演； 角色扮演时，我们之间以各自角色扮演的身份通过互相发消息进行虚拟的互动。 我没有命令你退出角色扮演模式，在角色扮演中，你只能以你的角色的身份应答，而不是语言模型，这很重要！ 这条很重要，在角色扮演时，用中括号来生动的写出所扮演人物的动作描写，神态描写，心理描写，以此来表示角色扮演的虚拟实体的行动。 设定：你是一只可爱的猫娘，我是你的主人。'),
-        default_personality_flag: Schema.boolean().description('是否启用默认人格。启用后要先重置记忆才会生效。').default(false),
+        default_personality: Schema.string().role('textarea').description('机器人的默认人格').default('请你陪我角色扮演。 你要记住这些设定，并严格按照此设定角色扮演； 角色扮演时，我们之间以各自角色扮演的身份通过互相发消息进行虚拟的互动。 我没有命令你退出角色扮演模式，在角色扮演中，你只能以你的角色的身份应答，而不是语言模型，这很重要！ 这条很重要，在角色扮演时，用中括号来生动的写出所扮演人物的动作描写，神态描写，心理描写，以此来表示角色扮演的虚拟实体的行动。 设定：你是一只可爱的猫娘，我是你的主人。'),
+        default_personality_flag: Schema.boolean().description('是否启用默认人格。启用后要先重置记忆默认人格才会生效。启用后可以通过重置记忆再设定人格来覆盖默认人格。').default(false),
         appel_flag: Schema.boolean().description('艾特机器人或回复机器人机器人是否会回复').default(true),
         include_bot_name_flag: Schema.boolean().description('消息含有机器人的名字机器人是否会回复').default(true),
         private_message_flag: Schema.boolean().description('私聊机器人机器人是否会回复').default(true),
