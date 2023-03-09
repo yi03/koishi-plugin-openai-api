@@ -86,18 +86,18 @@ export function apply(ctx: Context, config: Config) {
         h('quote', { id: session.messageId }) + reset(chatbot, session.uid)
       )
     })
-  ctx.middleware(async (session) => {
+  ctx.middleware(async (session ,next) => {
     if (ctx.bots[session.uid])
-      return; // ignore bots from self
+      return next(); // ignore bots from self
     const condition = getReplyCondition(session, config);
     if (condition === 0)
-      return; // 不回复
+      return next(); // 不回复
     const input = session.content.replace(/<[^>]*>/g, ''); // 去除XML元素
     if (input === '')
-      return; // ignore empty message
+      return next(); // ignore empty message
     logger.info(`condition ${condition} met, replying`);
     try {
-      await session.send(
+      session.send(
         h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input)
       )
     }
