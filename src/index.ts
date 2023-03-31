@@ -97,9 +97,15 @@ export function apply(ctx: Context, config: Config) {
       return next(); // ignore empty message
     logger.info(`condition ${condition} met, replying`);
     try {
-      session.send(
-        h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input)
-      )
+      if(condition === 3 && !config.private_message_quote_flag){
+        session.send(
+          await chat(chatbot, session.uid, input)
+        )
+      }else{
+        session.send(
+          h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input)
+        )
+      }
     }
     catch {
       session.send(

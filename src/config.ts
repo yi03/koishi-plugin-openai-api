@@ -9,6 +9,7 @@ export interface Config {
     appel_flag: boolean
     include_bot_name_flag: boolean
     private_message_flag: boolean
+    private_message_quote_flag: boolean
     max_tokens: number
     temperature: number
     presence_penalty: number
@@ -32,6 +33,7 @@ export const Config: Schema<Config> = Schema.intersect([
         appel_flag: Schema.boolean().description('艾特机器人或回复机器人机器人是否会回复').default(true),
         include_bot_name_flag: Schema.boolean().description('消息含有机器人的名字机器人是否会回复').default(true),
         private_message_flag: Schema.boolean().description('私聊机器人机器人是否会回复').default(true),
+        private_message_quote_flag: Schema.boolean().description('私聊机器人机器人是否会引用回复').default(true),
         memory_dir: Schema.string().description('记忆文件的路径').default("./openai-api_memory"),
         max_tokens: Schema.number().description('最长能记忆的Token数。设置的太大的话回复可能会被截断')
             .min(16).max(4096).step(1).default(3000),
