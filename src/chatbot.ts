@@ -93,4 +93,16 @@ export class Chatbot {
     const fileContent: string = JSON.stringify(memory, null, 2);
     fs.writeFileSync(filename, fileContent, 'utf-8');
   }
+
+  public async get_balance() {
+    const response = await this.ctx.http.axios({
+      url: "https://api.openai.com/dashboard/billing/credit_grants",
+      headers: {
+        'Authorization': `Bearer ${this.api_key}`,
+        'Content-Type': 'application/json',
+      },
+      method: 'get',
+    });
+    return response.data.total_available;
+  }
 }

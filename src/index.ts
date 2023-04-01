@@ -70,8 +70,16 @@ export function apply(ctx: Context, config: Config) {
     config.default_personality,
   );
 
-  const cmd1 = ctx.command(`openai-api`)
-  const cmd2 = ctx.command(`设定 <设定bot的人格:text>`)
+  ctx.command(`openai-api`).alias('op')
+    .option('balance', '-b')
+    .action(async ({ session, options }) => {
+      if (options.balance) {
+        session.send(
+          h('quote', { id: session.messageId }) + "余额为 " + await chatbot.get_balance() + " 美元"
+        )
+      }
+    })
+  ctx.command(`设定 <设定bot的人格:text>`)
     .alias('set')
     .action(async ({ session }, input) => {
       if (!input?.trim()) return session.execute(`help ${name}`)
@@ -79,14 +87,14 @@ export function apply(ctx: Context, config: Config) {
         h('quote', { id: session.messageId }) + set_personality(chatbot, session.uid, input)
       )
     })
-  const cmd3 = ctx.command(`重置`)
+  ctx.command(`重置`)
     .alias('reset')
     .action(async ({ session }) => {
       await session.send(
         h('quote', { id: session.messageId }) + reset(chatbot, session.uid)
       )
     })
-  ctx.middleware(async (session ,next) => {
+  ctx.middleware(async (session, next) => {
     if (ctx.bots[session.uid])
       return next(); // ignore bots from self
     const condition = getReplyCondition(session, config);
@@ -97,11 +105,11 @@ export function apply(ctx: Context, config: Config) {
       return next(); // ignore empty message
     logger.info(`condition ${condition} met, replying`);
     try {
-      if(condition === 3 && !config.private_message_quote_flag){
+      if (condition === 3 && !config.private_message_quote_flag) {
         session.send(
           await chat(chatbot, session.uid, input)
         )
-      }else{
+      } else {
         session.send(
           h('quote', { id: session.messageId }) + await chat(chatbot, session.uid, input)
         )
